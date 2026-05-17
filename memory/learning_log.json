@@ -1,0 +1,16 @@
+[
+  {
+    "topic": "nmap_efficiency",
+    "lesson": "Using -sV -sC flags provides good service detection balance",
+    "context": "Scanning public targets",
+    "confidence": 0.9,
+    "timestamp": "2026-05-16T16:50:15.371259"
+  },
+  {
+    "topic": "nmap_efficiency",
+    "lesson": "Using -sV -sC flags provides good service detection balance",
+    "context": "Scanning public targets",
+    "confidence": 0.9,
+    "timestamp": "2026-05-16T16:50:21.258688"
+  }
+]

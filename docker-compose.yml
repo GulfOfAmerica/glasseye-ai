@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  glasseye-ai:
+    build: .
+    image: glasseye-ai:latest
+    container_name: glasseye-ai-production
+    ports:
+      - "8002:8002"
+      - "5002:5002"
+      - "5001:5001"
+    environment:
+      - ENVIRONMENT=production
+      - LOG_LEVEL=info
+    volumes:
+      - ./memory:/app/memory
+      - ./logs:/app/logs
+      - ./results:/app/results
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - glasseye-network
+
+networks:
+  glasseye-network:
+    driver: bridge

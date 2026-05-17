@@ -1,0 +1,14 @@
+[
+  {
+    "target": "scanme.nmap.org",
+    "action": "reconnaissance",
+    "reasoning": "Standard scan approach for unknown target",
+    "confidence": 0.85
+  },
+  {
+    "target": "scanme.nmap.org",
+    "action": "reconnaissance",
+    "reasoning": "Standard scan approach for unknown target",
+    "confidence": 0.85
+  }
+]
