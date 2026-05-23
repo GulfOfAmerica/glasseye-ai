@@ -1,0 +1,25 @@
+
+        Bug Bounty Program: https://bounty.github.com
+        
+        ## Scope
+        - *.example.com
+        - api.example.com
+        - mobile apps (iOS, Android)
+        
+        ## Out of Scope
+        - marketing.example.com
+        - *.cdn.example.com
+        - Social engineering
+        - Denial of service
+        
+        ## Rewards
+        - Critical: $5,000 - $15,000
+        - High: $2,500 - $5,000
+        - Medium: $500 - $2,500
+        - Low: $100 - $500
+        
+        ## Safe Harbor
+        - Do not access other users' data
+        - Stop testing if PII discovered
+        - Report findings within 24 hours
+        

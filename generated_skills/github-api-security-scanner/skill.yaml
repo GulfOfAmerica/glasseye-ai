@@ -1,0 +1,11 @@
+author: GlasseyeOS AI Tool Generator
+compliance_level: safe_harbor
+description: Scan GitHub API endpoints for security issues
+generated_at: '2026-05-18T17:21:45.915842'
+name: github-api-security-scanner
+requires_authorization: true
+tools:
+- github_api_fuzzer
+- github_auth_tester
+- github_rate_limit_analyzer
+version: 1.0.0

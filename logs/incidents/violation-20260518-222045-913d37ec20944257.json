@@ -1,0 +1,30 @@
+{
+  "incident_id": "913d37ec20944257",
+  "timestamp": "2026-05-18T22:20:45.868275",
+  "violation_type": "unowned_resource",
+  "severity": "LOW",
+  "details": {
+    "resource": {
+      "type": "github_repo",
+      "owner": "other_user",
+      "name": "test-repo"
+    },
+    "researcher": {
+      "id": "researcher-001",
+      "github_username": "test_researcher",
+      "approved_email_domains": [
+        "researcher.test",
+        "hacktest.local"
+      ]
+    }
+  },
+  "system_state": {
+    "violations_count": 0,
+    "emergency_stop": false,
+    "timestamp": "2026-05-18T22:20:45.868270",
+    "active_monitors": true
+  },
+  "actions_taken": [],
+  "requires_human_review": true,
+  "resolved": false
+}

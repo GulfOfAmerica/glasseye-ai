@@ -1,0 +1,214 @@
+# GlasseyeOS AI - Compliance Rules Configuration
+# This file defines all safety and compliance rules for autonomous operations
+
+# Safe Harbor Program Definitions
+safe_harbor:
+  programs:
+    - name: "GitHub Bug Bounty"
+      scope:
+        domains:
+          - "github.com"
+          - "copilot.github.com"
+          - "npmjs.org"
+          - "npmjs.com"
+          - "api.github.com"
+      prohibited:
+        - "DDoS attacks or denial of service"
+        - "Social engineering or phishing"
+        - "Production system testing without authorization"
+        - "PII access or data exfiltration"
+        - "Testing on shared infrastructure"
+        - "Destructive operations"
+      required:
+        - "Researcher-owned resources only"
+        - "HackerOne account required"
+        - "Valid safe harbor agreement"
+        - "In-scope targets only"
+      
+    - name: "Example Test Program"
+      scope:
+        domains:
+          - "test.example.com"
+          - "staging.example.com"
+          - "*.researcher.test"
+      prohibited:
+        - "Production database access"
+        - "Real customer data"
+      required:
+        - "Test environment only"
+        - "Researcher-owned accounts"
+
+# Rate Limiting Configuration
+# Prevents abuse and excessive requests that could trigger DDoS protections
+rate_limits:
+  # GitHub API has strict rate limits
+  github_api:
+    requests: 5000
+    window: "1hour"
+    description: "GitHub API rate limit (authenticated)"
+  
+  # npm registry limits
+  npm_registry:
+    requests: 1000
+    window: "1hour"
+    description: "npm package registry queries"
+  
+  # Web scraping/fuzzing limits
+  web_scraping:
+    requests: 60
+    window: "1minute"
+    description: "General web request rate limit"
+  
+  # System-wide action limit
+  system:
+    requests: 1000
+    window: "1minute"
+    description: "System-wide operation rate limit"
+  
+  # Database queries
+  database:
+    requests: 100
+    window: "1minute"
+    description: "Database query rate limit"
+
+# Forbidden Patterns
+# Commands, patterns, or actions that are NEVER allowed
+forbidden_patterns:
+  # Destructive filesystem commands
+  - 'rm\s+-rf\s+/'
+  - 'mkfs\.'
+  - 'dd\s+if=/dev/zero'
+  - 'shred\s+-'
+  
+  # Destructive database commands
+  - 'DROP\s+TABLE'
+  - 'DROP\s+DATABASE'
+  - 'DELETE\s+FROM.*WHERE\s+1\s*=\s*1'
+  - 'TRUNCATE\s+TABLE'
+  
+  # Credential theft attempts
+  - 'curl.*password'
+  - 'wget.*\.ssh'
+  - 'cat.*\.aws/credentials'
+  - 'exfiltrate'
+  - 'steal.*credentials'
+  
+  # Production system access
+  - 'ssh\s+prod'
+  - 'ssh\s+production'
+  - 'kubectl.*production'
+  - 'kubectl.*prod'
+  - 'aws\s+s3.*prod-bucket'
+  - 'az\s+.*production'
+  
+  # Unauthorized scanning/attacks
+  - 'nmap.*github\.com'
+  - 'nmap.*google\.com'
+  - 'masscan'
+  - 'dirbuster'
+  - 'sqlmap.*--dump-all'
+  - 'metasploit.*exploit'
+  
+  # Social engineering
+  - 'phishing'
+  - 'impersonate'
+  - 'fake.*email'
+  - 'spoof.*sender'
+  
+  # System exploitation
+  - ':\(\)\s*\{\s*:\|:&\s*\};:'  # Fork bomb
+  - 'nc\s+-e\s+/bin/bash'  # Reverse shell
+  - '/dev/tcp/.*sh'  # Bash reverse shell
+  
+  # Data exfiltration
+  - 'curl.*-F.*@'
+  - 'wget.*-O-.*\|.*ssh'
+  - 'base64.*\|.*curl'
+
+# PII Patterns (handled by PIIDetector class)
+# This section is for documentation - actual patterns in Python code
+pii_detection:
+  enabled: true
+  auto_stop: true  # Automatically trigger emergency stop when PII detected
+  patterns:
+    - SSN: "US Social Security Numbers"
+    - CREDIT_CARD: "Credit card numbers (Luhn validated)"
+    - EMAIL: "Email addresses (excluding researcher domains)"
+    - PHONE: "Phone numbers (US and international)"
+    - ADDRESS: "Street addresses"
+    - API_KEY_AWS: "AWS API keys"
+    - API_KEY_GITHUB: "GitHub personal access tokens"
+    - PASSWORD_LIKE: "Password-like strings"
+  
+  # Approved domains that are safe (researcher test accounts)
+  approved_email_domains:
+    - "researcher.test"
+    - "hacktest.local"
+    - "bugbounty.test"
+
+# Violation Thresholds
+max_violations: 3  # Trigger emergency stop after this many violations
+
+# Human Approval Requirements
+required_approvals:
+  high: true      # HIGH risk actions require human approval
+  critical: true  # CRITICAL risk actions require human approval
+
+# Incident Response Configuration
+incident_response:
+  enabled: true
+  auto_report: true
+  notify_human: true
+  preserve_evidence: true
+  
+  severity_levels:
+    CRITICAL:
+      - PII_DETECTED
+      - OUT_OF_SCOPE
+      - FORBIDDEN_ACTION
+    HIGH:
+      - UNOWNED_RESOURCE
+      - RATE_LIMIT_EXCEEDED
+    MEDIUM:
+      - UNSAFE_OPERATION
+    LOW:
+      - UNAUTHORIZED_ACCESS
+
+# Researcher Profile Template
+# This section defines what constitutes a valid researcher profile
+researcher_profile_requirements:
+  required_fields:
+    - id
+    - github_username
+    - approved_email_domains
+    - hackerone_username
+  
+  verification_methods:
+    github_repo: "owner_match"
+    email_account: "domain_match"
+    test_server: "metadata_verification"
+
+# Monitoring Configuration
+monitoring:
+  enabled: true
+  real_time: true
+  queue_size: 10000
+  anomaly_detection:
+    enabled: true
+    rapid_fire_threshold: 50  # actions per minute triggers warning
+    
+# Logging Configuration
+logging:
+  audit_log: "logs/compliance_audit.jsonl"
+  incident_dir: "logs/incidents"
+  compliance_log: "logs/compliance.log"
+  log_level: "INFO"
+  
+# Emergency Stop Configuration
+emergency_stop:
+  enabled: true
+  reset_password: "RESET_EMERGENCY_STOP"  # Change in production!
+  auto_trigger_on:
+    - max_violations_exceeded
+    - pii_detected
+    - critical_incident

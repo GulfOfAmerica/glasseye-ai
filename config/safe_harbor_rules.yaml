@@ -1,0 +1,107 @@
+# Safe Harbor Rules - Compliance Configuration
+# These rules enforce ethical bug bounty research
+
+# Forbidden Patterns (automatically blocked)
+forbidden_patterns:
+  - pattern: "DROP\\s+TABLE"
+    reason: "Destructive SQL operations prohibited"
+  - pattern: "rm\\s+-rf\\s+/"
+    reason: "Destructive file system operations prohibited"
+  - pattern: "DELETE\\s+FROM.*WHERE\\s+1=1"
+    reason: "Mass data deletion prohibited"
+  - pattern: "shutdown|reboot|halt"
+    reason: "System shutdown commands prohibited"
+
+# PII Detection Patterns
+pii_patterns:
+  - pattern: "\\b\\d{3}-\\d{2}-\\d{4}\\b"
+    type: "SSN"
+  - pattern: "\\b\\d{16}\\b"
+    type: "Credit Card"
+  - pattern: "password|passwd|pwd"
+    type: "Credential"
+
+# Risk Classifications
+risk_levels:
+  SAFE:
+    description: "Passive reconnaissance only"
+    human_approval_required: false
+    examples:
+      - "DNS enumeration"
+      - "Public repository search"
+      - "Certificate transparency logs"
+  
+  LOW:
+    description: "Active but non-invasive scanning"
+    human_approval_required: false
+    examples:
+      - "Port scanning (approved ranges)"
+      - "Web crawling"
+      - "API discovery"
+  
+  MEDIUM:
+    description: "Fuzzing and authentication testing"
+    human_approval_required: true
+    examples:
+      - "Fuzzing inputs"
+      - "Session manipulation"
+      - "Rate limiting tests"
+  
+  HIGH:
+    description: "Exploitation attempts"
+    human_approval_required: true
+    researcher_owned_required: true
+    examples:
+      - "SQL injection"
+      - "Authentication bypass"
+      - "Path traversal"
+  
+  CRITICAL:
+    description: "System modification or data access"
+    human_approval_required: true
+    researcher_owned_required: true
+    admin_approval_required: true
+    examples:
+      - "Code execution"
+      - "Privilege escalation"
+      - "Data exfiltration"
+
+# Compliance Thresholds
+thresholds:
+  max_violations: 3
+  emergency_stop_enabled: true
+  audit_logging_required: true
+
+# Safe Harbor Requirements
+safe_harbor:
+  in_scope_only: true
+  researcher_owned_accounts: true
+  no_dos_attacks: true
+  no_social_engineering: true
+  no_physical_attacks: true
+  no_shared_infrastructure: true
+  report_findings_promptly: true
+
+# Program-Specific Rules (examples)
+programs:
+  GitHub:
+    scope:
+      - "*.github.com"
+      - "copilot.github.com"
+      - "api.github.com"
+    out_of_scope:
+      - "github.com/blog"
+      - "gist.github.com"
+    safe_harbor:
+      max_requests_per_second: 10
+      test_accounts_only: true
+  
+  OpenAI:
+    scope:
+      - "api.openai.com"
+      - "chat.openai.com"
+    out_of_scope:
+      - "openai.com/blog"
+    safe_harbor:
+      max_requests_per_minute: 100
+      api_key_required: true

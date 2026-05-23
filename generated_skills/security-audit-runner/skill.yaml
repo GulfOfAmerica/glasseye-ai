@@ -1,0 +1,8 @@
+author: GlasseyeOS AI Tool Generator
+compliance_level: safe_harbor
+description: Auto-generated skill for compliance-demo
+generated_at: '2026-05-18T17:22:56.550143'
+name: security-audit-runner
+requires_authorization: true
+tools: []
+version: 1.0.0

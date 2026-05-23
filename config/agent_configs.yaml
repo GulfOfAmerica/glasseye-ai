@@ -1,0 +1,105 @@
+# Agent Configuration
+
+# OSINT Agent (glasseye-osint-intelligence)
+osint_agent:
+  name: "OSINT Intelligence Agent"
+  agent_type: "glasseye-osint-intelligence"
+  capabilities:
+    - "Subdomain enumeration"
+    - "Technology stack detection"
+    - "Social media intelligence"
+    - "Public repository search"
+    - "Certificate transparency"
+  tools:
+    - "Amass"
+    - "Sublist3r"
+    - "theHarvester"
+    - "Shodan API"
+  max_concurrent_tasks: 3
+  timeout_minutes: 30
+
+# Static Analysis Agent (glasswing-security-analyzer)
+static_analysis_agent:
+  name: "Static Security Analyzer"
+  agent_type: "glasswing-security-analyzer"
+  capabilities:
+    - "Dependency scanning"
+    - "Code vulnerability analysis"
+    - "Configuration review"
+    - "Secret detection"
+  tools:
+    - "Semgrep"
+    - "Bandit (Python)"
+    - "ESLint security plugins"
+    - "TruffleHog (secrets)"
+  max_concurrent_tasks: 2
+  timeout_minutes: 60
+
+# Dynamic Analysis Agent (custom fuzzer)
+dynamic_analysis_agent:
+  name: "Dynamic Fuzzer"
+  agent_type: "dynamic-fuzzer"
+  capabilities:
+    - "API fuzzing"
+    - "Parameter pollution testing"
+    - "Authentication testing"
+    - "Rate limiting bypass"
+  tools:
+    - "Burp Suite Pro"
+    - "Custom Python fuzzers"
+    - "Postman collections"
+  max_concurrent_tasks: 5
+  timeout_minutes: 120
+
+# Contract Auditor (glasswing-contract-auditor)
+contract_auditor:
+  name: "Smart Contract Auditor"
+  agent_type: "glasswing-contract-auditor"
+  capabilities:
+    - "Solidity analysis"
+    - "Reentrancy detection"
+    - "Access control review"
+  tools:
+    - "Slither"
+    - "Mythril"
+    - "Echidna"
+  max_concurrent_tasks: 1
+  timeout_minutes: 90
+
+# Documentation Agent
+documentation_agent:
+  name: "Report Generator"
+  agent_type: "report-generator"
+  capabilities:
+    - "Finding aggregation"
+    - "Report formatting"
+    - "PoC generation"
+    - "Impact assessment"
+  max_concurrent_tasks: 1
+  timeout_minutes: 15
+
+# Orchestration Settings
+orchestration:
+  max_total_concurrent_agents: 10
+  task_priority_levels: 10
+  queue_strategy: "priority"  # priority, fifo, roi
+  auto_scaling:
+    enabled: true
+    min_agents: 1
+    max_agents: 20
+    scale_up_threshold: 0.8  # 80% utilization
+    scale_down_threshold: 0.2  # 20% utilization
+
+# Resource Limits
+resource_limits:
+  max_memory_mb: 4096
+  max_cpu_percent: 80
+  max_network_bandwidth_mbps: 100
+  max_disk_io_mbps: 50
+
+# Monitoring
+monitoring:
+  health_check_interval_seconds: 60
+  metrics_collection: true
+  log_level: "INFO"
+  alert_on_agent_failure: true

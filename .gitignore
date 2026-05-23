@@ -1,33 +1,42 @@
+# Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
+*.py[cod]
+*$py.class
 *.so
-*.egg
+.Python
+env/
+venv/
 *.egg-info/
 dist/
 build/
-*.log
-deployment_results.json
-.env
-.venv
-venv/
-ENV/
-env.bak/
-venv.bak/
-*.swp
-*.swo
-.DS_Store
+
+# IDEs
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
 
-# Sensitive credential files
-.env.integrated
-*CREDENTIALS*.json
-*SCRAPED*.json
-*api_config.json
-CREDENTIAL_SUMMARY.md
-FINAL_DISCOVERY.md
-backup_*/
-.credentials.json
+# Logs
+logs/*.log
+logs/*.jsonl
+
+# Database
+*.db
+
+# API Credentials (IMPORTANT!)
+data_sources/configs/api_credentials.json
+
+# Cache
+data_sources/cache/*.jsonl
+
+# Backups
+tools/backups/
+*.bak
+self_updater_backup.py
+enhanced_features.py
+enhanced_features_part2.py
+
+# OS
+.DS_Store
+Thumbs.db

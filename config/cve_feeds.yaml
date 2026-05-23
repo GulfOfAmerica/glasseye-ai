@@ -1,0 +1,97 @@
+# CVE Feed Sources Configuration
+
+# National Vulnerability Database
+nvd:
+  name: "National Vulnerability Database"
+  url: "https://services.nvd.nist.gov/rest/json/cves/2.0"
+  api_key_required: false
+  update_frequency: "daily"
+  filters:
+    keywords:
+      - "AI"
+      - "LLM"
+      - "GPT"
+      - "Copilot"
+      - "API"
+      - "authentication"
+      - "authorization"
+    min_cvss: 7.0
+    published_after: "2024-01-01"
+
+# GitHub Security Advisories
+github_advisories:
+  name: "GitHub Security Advisories"
+  url: "https://api.github.com/advisories"
+  api_key_required: true
+  update_frequency: "daily"
+  filters:
+    ecosystems:
+      - "npm"
+      - "pip"
+      - "maven"
+    severity:
+      - "high"
+      - "critical"
+
+# HackerOne Disclosed Reports
+hackerone:
+  name: "HackerOne Disclosed Reports"
+  url: "https://api.hackerone.com/v1/hackers/disclosed_reports"
+  api_key_required: true
+  update_frequency: "weekly"
+  filters:
+    programs:
+      - "GitHub"
+      - "OpenAI"
+      - "Microsoft"
+    min_bounty: 1000
+    severity:
+      - "medium"
+      - "high"
+      - "critical"
+
+# MITRE CVE List
+mitre:
+  name: "MITRE CVE List"
+  url: "https://cve.mitre.org/data/downloads/allitems.csv"
+  api_key_required: false
+  update_frequency: "weekly"
+  filters:
+    keywords:
+      - "web application"
+      - "API"
+      - "authentication"
+
+# Security Research Sources
+research_sources:
+  portswigger:
+    name: "PortSwigger Research"
+    url: "https://portswigger.net/research"
+    update_frequency: "weekly"
+    
+  owasp:
+    name: "OWASP Top 10"
+    url: "https://owasp.org/www-project-top-ten/"
+    update_frequency: "monthly"
+  
+  sans:
+    name: "SANS Internet Storm Center"
+    url: "https://isc.sans.edu/api/"
+    update_frequency: "daily"
+
+# Learning Sources (for pattern extraction)
+learning_sources:
+  bug_bounty_blogs:
+    - "https://blog.detectify.com"
+    - "https://portswigger.net/daily-swig"
+    - "https://blog.assetnote.io"
+  
+  github_repos:
+    - "payloadbox/sql-injection-payload-list"
+    - "swisskyrepo/PayloadsAllTheThings"
+    - "danielmiessler/SecLists"
+  
+  arxiv_keywords:
+    - "vulnerability detection"
+    - "fuzzing"
+    - "security testing"
