@@ -1359,11 +1359,16 @@ if __name__ == "__main__":
         print(f"     - {agent_name}: {agent_type.value}")
     
     # Spawn custom OSINT agent
-    custom_agent = orchestrator.spawn_custom_agent(
-        agent_name='osint',
-        task_params={'target': 'example.com', 'depth': 'comprehensive'}
-    )
-    print(f"   Spawned custom OSINT agent: {custom_agent[:40]}...")
+    try:
+        custom_agent = orchestrator.spawn_custom_agent(
+            agent_name='osint',
+            task_params={'target': 'example.com', 'depth': 'comprehensive'}
+        )
+    except RuntimeError as e:
+        print(f'   Note: {e} (agents still active from previous steps)')
+        custom_agent = None
+    if custom_agent:
+        print(f"   Spawned custom OSINT agent: {custom_agent[:40]}...")
     print()
     
     # Test 9: Orchestrator Status
