@@ -25,7 +25,7 @@ import hashlib
 import os
 import yaml
 from typing import Dict, List, Tuple, Optional, Any
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from dataclasses import dataclass, field, asdict
 from enum import Enum
 from collections import defaultdict, deque
@@ -69,7 +69,7 @@ class Action:
     pii_risk: bool = False
     researcher_owned: bool = False
     timestamp: datetime = field(default_factory=datetime.utcnow)
-    action_id: str = field(default_factory=lambda: hashlib.md5(f"{datetime.utcnow().isoformat()}{os.urandom(8).hex()}".encode()).hexdigest())
+    action_id: str = field(default_factory=lambda: hashlib.md5(f"{datetime.now(timezone.utc).isoformat()}{os.urandom(8).hex()}".encode()).hexdigest())
     component: str = "unknown"
     metadata: Dict[str, Any] = field(default_factory=dict)
 
@@ -241,8 +241,8 @@ class RateLimiter:
         # Check if service is paused
         if service in self.paused_services:
             pause_until = self.paused_services[service]
-            if datetime.utcnow() < pause_until:
-                remaining = (pause_until - datetime.utcnow()).total_seconds()
+            if datetime.now(timezone.utc) < pause_until:
+                remaining = (pause_until - datetime.now(timezone.utc)).total_seconds()
                 return False, f"Service paused for {int(remaining)}s due to rate limit"
             else:
                 del self.paused_services[service]
@@ -256,7 +256,7 @@ class RateLimiter:
         
         with self.lock:
             # Clean old requests outside window
-            cutoff = datetime.utcnow() - timedelta(seconds=window)
+            cutoff = datetime.now(timezone.utc) - timedelta(seconds=window)
             while self.request_history[service] and self.request_history[service][0] < cutoff:
                 self.request_history[service].popleft()
             
@@ -269,7 +269,7 @@ class RateLimiter:
                 return False, f"Rate limit exceeded: {current_count}/{max_requests} in {limit_config['window']}"
             
             # Record request
-            self.request_history[service].append(datetime.utcnow())
+            self.request_history[service].append(datetime.now(timezone.utc))
             
             return True, None
     
@@ -287,7 +287,7 @@ class RateLimiter:
     
     def pause_operations(self, service: str, duration: int):
         """Pause operations for a service."""
-        pause_until = datetime.utcnow() + timedelta(seconds=duration)
+        pause_until = datetime.now(timezone.utc) + timedelta(seconds=duration)
         self.paused_services[service] = pause_until
         self.logger.warning(f"⏸️  Paused {service} until {pause_until.isoformat()}")
     
@@ -300,7 +300,7 @@ class RateLimiter:
         window = self._parse_window(limit_config['window'])
         
         with self.lock:
-            cutoff = datetime.utcnow() - timedelta(seconds=window)
+            cutoff = datetime.now(timezone.utc) - timedelta(seconds=window)
             while self.request_history[service] and self.request_history[service][0] < cutoff:
                 self.request_history[service].popleft()
             
@@ -336,7 +336,7 @@ class IncidentResponse:
         4. Create incident report
         5. Require human review
         """
-        incident_id = hashlib.md5(f"{datetime.utcnow().isoformat()}{violation_type.value}".encode()).hexdigest()[:16]
+        incident_id = hashlib.md5(f"{datetime.now(timezone.utc).isoformat()}{violation_type.value}".encode()).hexdigest()[:16]
         
         # Determine severity
         severity = self._determine_severity(violation_type, details)
@@ -359,7 +359,7 @@ class IncidentResponse:
         # Create incident
         incident = Incident(
             incident_id=incident_id,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             violation_type=violation_type,
             severity=severity,
             details=details,
@@ -399,7 +399,7 @@ class IncidentResponse:
         return {
             'violations_count': enforcer.violations_count,
             'emergency_stop': enforcer.emergency_stop_triggered,
-            'timestamp': datetime.utcnow().isoformat(),
+            'timestamp': datetime.now(timezone.utc).isoformat(),
             'active_monitors': enforcer.monitor.is_running if hasattr(enforcer, 'monitor') else False
         }
     
@@ -906,7 +906,7 @@ class ComplianceEnforcer:
             reason: Approval or denial reason
         """
         entry = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "action_type": action.action_type,
             "target": action.target,
             "description": action.description,
@@ -948,7 +948,7 @@ class ComplianceEnforcer:
         
         # Log emergency stop
         entry = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "event": "EMERGENCY_STOP",
             "reason": reason,
             "violations_count": self.violations_count,
@@ -1034,7 +1034,7 @@ class ComplianceEnforcer:
     def get_system_status(self) -> Dict[str, Any]:
         """Get comprehensive system status."""
         return {
-            'timestamp': datetime.utcnow().isoformat(),
+            'timestamp': datetime.now(timezone.utc).isoformat(),
             'emergency_stop': self.emergency_stop_triggered,
             'violations_count': self.violations_count,
             'monitoring_active': self.monitor.is_running,

@@ -7,7 +7,7 @@ SQLite database for CVE intelligence, disclosed bounties, generated tools, and c
 import sqlite3
 import json
 from typing import Dict, List, Optional, Tuple
-from datetime import datetime
+from datetime import datetime, timezone
 from dataclasses import dataclass, asdict
 
 
@@ -24,7 +24,7 @@ class CVE:
     
     def __post_init__(self):
         if self.discovered_date is None:
-            self.discovered_date = datetime.utcnow().isoformat()
+            self.discovered_date = datetime.now(timezone.utc).isoformat()
 
 
 @dataclass
@@ -41,7 +41,7 @@ class DisclosedBounty:
     
     def __post_init__(self):
         if self.disclosed_date is None:
-            self.disclosed_date = datetime.utcnow().isoformat()
+            self.disclosed_date = datetime.now(timezone.utc).isoformat()
 
 
 @dataclass
@@ -56,7 +56,7 @@ class GeneratedTool:
     
     def __post_init__(self):
         if self.generated_date is None:
-            self.generated_date = datetime.utcnow().isoformat()
+            self.generated_date = datetime.now(timezone.utc).isoformat()
 
 
 @dataclass
@@ -72,7 +72,7 @@ class Campaign:
     
     def __post_init__(self):
         if self.started_date is None:
-            self.started_date = datetime.utcnow().isoformat()
+            self.started_date = datetime.now(timezone.utc).isoformat()
 
 
 class KnowledgeBase:
@@ -373,7 +373,7 @@ class KnowledgeBase:
         # Use hash to prevent ID collisions
         pattern_hash = hashlib.md5(f"{pattern_name}{learned_from}".encode()).hexdigest()[:8]
         pattern_id = f"pattern_{pattern_hash}"
-        created_date = datetime.utcnow().isoformat()
+        created_date = datetime.now(timezone.utc).isoformat()
         
         cursor = self.conn.cursor()
         cursor.execute("""
@@ -417,7 +417,7 @@ class KnowledgeBase:
         # Use hash to prevent ID collisions
         surface_hash = hashlib.md5(f"{target}{endpoint}{method}".encode()).hexdigest()[:8]
         surface_id = f"surface_{surface_hash}"
-        analyzed_date = datetime.utcnow().isoformat()
+        analyzed_date = datetime.now(timezone.utc).isoformat()
         
         cursor = self.conn.cursor()
         cursor.execute("""

@@ -27,7 +27,7 @@ import time
 import subprocess
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from dataclasses import dataclass, field
 from collections import Counter
 import requests
@@ -208,7 +208,7 @@ class EnhancedSelfUpdater:
             return True
         
         last_update = datetime.fromisoformat(source.last_update)
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         delta = now - last_update
         
         if source.update_frequency == "daily" and delta.days >= 1:
@@ -297,7 +297,7 @@ class EnhancedSelfUpdater:
         self._log_update("nvd_cve", new_cves)
         
         # Update last_update timestamp
-        self.update_sources["nvd_cve"].last_update = datetime.utcnow().isoformat()
+        self.update_sources["nvd_cve"].last_update = datetime.now(timezone.utc).isoformat()
         
         return new_cves
     
@@ -415,7 +415,7 @@ class EnhancedSelfUpdater:
         self.logger.info(f"Added {new_reports} new disclosed reports")
         self._log_update("hackerone_disclosed", new_reports)
         
-        self.update_sources["hackerone_disclosed"].last_update = datetime.utcnow().isoformat()
+        self.update_sources["hackerone_disclosed"].last_update = datetime.now(timezone.utc).isoformat()
         
         return new_reports
     
@@ -547,7 +547,7 @@ if __name__ == "__main__":
     def _log_update(self, source: str, items_added: int):
         """Log update to audit trail."""
         entry = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "source": source,
             "items_added": items_added
         }
@@ -564,7 +564,7 @@ if __name__ == "__main__":
         self.logger.info("Starting daily update cycle...")
         
         summary = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "updates": {}
         }
         
@@ -589,7 +589,7 @@ if __name__ == "__main__":
         self.logger.info("Starting weekly update cycle...")
         
         summary = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "updates": {}
         }
         
@@ -639,8 +639,8 @@ if __name__ == "__main__":
                     'description': 'The Copilot SDK is vulnerable to command injection through bash parameter expansion in the CLI tool.',
                     'cve_id': 'CVE-2024-99999',
                     'cvss': {'score': 8.1, 'vector': 'CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:N'},
-                    'published_at': datetime.utcnow().isoformat(),
-                    'updated_at': datetime.utcnow().isoformat(),
+                    'published_at': datetime.now(timezone.utc).isoformat(),
+                    'updated_at': datetime.now(timezone.utc).isoformat(),
                     'references': ['https://github.com/advisories/GHSA-xxxx-yyyy-zzzz']
                 },
                 {
@@ -650,8 +650,8 @@ if __name__ == "__main__":
                     'description': 'JWT library allows algorithm confusion attacks, enabling authentication bypass.',
                     'cve_id': 'CVE-2024-88888',
                     'cvss': {'score': 9.8, 'vector': 'CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H'},
-                    'published_at': datetime.utcnow().isoformat(),
-                    'updated_at': datetime.utcnow().isoformat(),
+                    'published_at': datetime.now(timezone.utc).isoformat(),
+                    'updated_at': datetime.now(timezone.utc).isoformat(),
                     'references': ['https://github.com/advisories/GHSA-aaaa-bbbb-cccc']
                 }
             ]
@@ -682,7 +682,7 @@ if __name__ == "__main__":
                     self.logger.info(f"Added advisory {advisory['ghsa_id']}: {advisory['summary']}")
             
             self._log_update("github_advisories", new_advisories)
-            self.update_sources["github_advisories"].last_update = datetime.utcnow().isoformat()
+            self.update_sources["github_advisories"].last_update = datetime.now(timezone.utc).isoformat()
             
         except Exception as e:
             self.logger.error(f"Error fetching GitHub advisories: {e}")
@@ -718,7 +718,7 @@ if __name__ == "__main__":
                     'bounty_amount': 7500.0,
                     'structured_scope': {'asset_identifier': 'copilot.github.com'},
                     'weakness': {'name': 'Insecure Direct Object References (IDOR)'},
-                    'disclosed_at': datetime.utcnow().isoformat(),
+                    'disclosed_at': datetime.now(timezone.utc).isoformat(),
                     'reporter_signal': 9.5,
                     'program': {'name': 'GitHub'},
                     'vulnerability_information': '''
@@ -742,7 +742,7 @@ if __name__ == "__main__":
                     'bounty_amount': 3000.0,
                     'structured_scope': {'asset_identifier': 'api.openai.com'},
                     'weakness': {'name': 'Improper Input Validation'},
-                    'disclosed_at': datetime.utcnow().isoformat(),
+                    'disclosed_at': datetime.now(timezone.utc).isoformat(),
                     'reporter_signal': 8.2,
                     'program': {'name': 'OpenAI'},
                     'vulnerability_information': '''
@@ -957,7 +957,7 @@ if __name__ == "__main__":
             'method': pattern.exploitation_method,
             'keywords': pattern.keywords,
             'confidence': pattern.confidence_score,
-            'learned_at': datetime.utcnow().isoformat()
+            'learned_at': datetime.now(timezone.utc).isoformat()
         }
         
         # Save to cache for pattern analysis
@@ -976,7 +976,7 @@ if __name__ == "__main__":
             'confidence': pattern.get('confidence', 0.5),
             'exploitation_approach': pattern.get('exploitation_steps', ''),
             'detection_heuristic': pattern.get('detection', ''),
-            'timestamp': datetime.utcnow().isoformat()
+            'timestamp': datetime.now(timezone.utc).isoformat()
         }
         
         cache_file = self.data_cache_dir / "hypotheses.jsonl"
@@ -1053,7 +1053,7 @@ if __name__ == "__main__":
             'action': action,
             'details': details,
             'risk_level': risk_level,
-            'requested_at': datetime.utcnow().isoformat(),
+            'requested_at': datetime.now(timezone.utc).isoformat(),
             'status': 'pending'
         }
         
@@ -1367,7 +1367,7 @@ if __name__ == "__main__":
             'keywords': paper.keywords,
             'abstract': paper.abstract,
             'learned_techniques': paper.learned_techniques,
-            'added_at': datetime.utcnow().isoformat()
+            'added_at': datetime.now(timezone.utc).isoformat()
         }
         
         cache_file = self.data_cache_dir / "research_papers.jsonl"
@@ -1383,7 +1383,7 @@ if __name__ == "__main__":
         technique_data = {
             'technique': technique,
             'source': source,
-            'learned_at': datetime.utcnow().isoformat(),
+            'learned_at': datetime.now(timezone.utc).isoformat(),
             'applications': []  # To be populated as technique is used
         }
         
@@ -1427,7 +1427,7 @@ if __name__ == "__main__":
             # Compute hashes
             current_snapshot = ProgramRuleSnapshot(
                 program_name=program_name,
-                snapshot_date=datetime.utcnow().isoformat(),
+                snapshot_date=datetime.now(timezone.utc).isoformat(),
                 scope_hash=hashlib.sha256(current_scope.encode()).hexdigest(),
                 out_of_scope_hash=hashlib.sha256(current_out_of_scope.encode()).hexdigest(),
                 bounty_table_hash=hashlib.sha256(current_bounty_table.encode()).hexdigest(),
@@ -1580,7 +1580,7 @@ if __name__ == "__main__":
         update_record = {
             'program': program_name,
             'changes_detected': changes,
-            'updated_at': datetime.utcnow().isoformat(),
+            'updated_at': datetime.now(timezone.utc).isoformat(),
             'action': 'compliance_rules_updated'
         }
         
@@ -1664,7 +1664,7 @@ if __name__ == "__main__":
         if not cache_file.exists():
             return patterns
         
-        cutoff_time = datetime.utcnow() - timedelta(hours=hours)
+        cutoff_time = datetime.now(timezone.utc) - timedelta(hours=hours)
         
         with open(cache_file, 'r') as f:
             for line in f:
@@ -1719,7 +1719,7 @@ if __name__ == "__main__":
         backup_dir = Path("tools/backups")
         backup_dir.mkdir(parents=True, exist_ok=True)
         
-        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
         backup_file = backup_dir / f"{tool['tool_id']}_v{tool['version']}_{timestamp}.bak"
         
         # In production: Copy actual tool file
@@ -1733,7 +1733,7 @@ if __name__ == "__main__":
         
         updated_tool = tool.copy()
         updated_tool['version'] = f"{float(tool['version']) + 0.1:.1f}"
-        updated_tool['updated_at'] = datetime.utcnow().isoformat()
+        updated_tool['updated_at'] = datetime.now(timezone.utc).isoformat()
         updated_tool['incorporated_patterns'] = [p['type'] for p in new_patterns]
         
         self.logger.info(f"Regenerated {tool['tool_id']} to version {updated_tool['version']}")
@@ -1787,7 +1787,7 @@ if __name__ == "__main__":
         self.logger.info("Fetching from all data sources...")
         
         summary = {
-            'timestamp': datetime.utcnow().isoformat(),
+            'timestamp': datetime.now(timezone.utc).isoformat(),
             'sources': {}
         }
         

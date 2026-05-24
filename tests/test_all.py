@@ -344,7 +344,7 @@ def run_tests():
     suite.addTests(loader.loadTestsFromTestCase(TestComplianceEnforcer))
     suite.addTests(loader.loadTestsFromTestCase(TestKnowledgeBase))
     suite.addTests(loader.loadTestsFromTestCase(TestGlasseyeAI))
-    suite.addTests(loader.loadTestsFromTestCase(TestEnhancedAgentOrchestrator))
+    suite.addTests(loader.loadTestsFromTestCase(TestAgentOrchestrator))
     
     # Run tests
     runner = unittest.TextTestRunner(verbosity=2)

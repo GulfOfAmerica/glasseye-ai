@@ -16,7 +16,7 @@ Features:
 import logging
 import json
 from typing import Dict, List, Optional, Callable, Any
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from dataclasses import dataclass, asdict, field
 from enum import Enum
 import threading
@@ -75,7 +75,7 @@ class AgentTask:
     retry_count: int = 0
     max_retries: int = 3
     dependencies: List[str] = field(default_factory=list)
-    created_at: str = field(default_factory=lambda: datetime.utcnow().isoformat())
+    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     completed_at: Optional[str] = None
     error: Optional[str] = None
 
@@ -91,7 +91,7 @@ class AgentInstance:
     pid: Optional[int] = None
     memory_mb: float = 0.0
     cpu_percent: float = 0.0
-    last_heartbeat: str = field(default_factory=lambda: datetime.utcnow().isoformat())
+    last_heartbeat: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 
 @dataclass
@@ -102,7 +102,7 @@ class AgentMessage:
     to_agent: Optional[str]  # None for broadcast
     message_type: MessageType
     content: Dict
-    timestamp: str = field(default_factory=lambda: datetime.utcnow().isoformat())
+    timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     channel: str = "default"
 
 
@@ -131,7 +131,7 @@ class Finding:
     discovered_by: str
     cvss_score: Optional[float] = None
     evidence: Dict = field(default_factory=dict)
-    timestamp: str = field(default_factory=lambda: datetime.utcnow().isoformat())
+    timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 
 class ResourceManager:
@@ -255,7 +255,7 @@ class AgentMessenger:
     
     def _generate_message_id(self) -> str:
         """Generate unique message ID."""
-        timestamp = datetime.utcnow().isoformat()
+        timestamp = datetime.now(timezone.utc).isoformat()
         return hashlib.md5(timestamp.encode()).hexdigest()[:12]
 
 
@@ -371,7 +371,7 @@ class ResultAggregator:
     
     def _generate_finding_id(self) -> str:
         """Generate unique finding ID."""
-        timestamp = datetime.utcnow().isoformat()
+        timestamp = datetime.now(timezone.utc).isoformat()
         return f"finding_{hashlib.md5(timestamp.encode()).hexdigest()[:8]}"
 
 
@@ -390,7 +390,7 @@ class CampaignWorkflow:
             'campaign_id': config.campaign_id,
             'target': config.target,
             'program': config.program,
-            'started': datetime.utcnow().isoformat(),
+            'started': datetime.now(timezone.utc).isoformat(),
             'phases': [],
             'findings': [],
             'status': 'running'
@@ -414,7 +414,7 @@ class CampaignWorkflow:
                         campaign_result['status'] = 'stopped_by_human'
                         break
             
-            campaign_result['completed'] = datetime.utcnow().isoformat()
+            campaign_result['completed'] = datetime.now(timezone.utc).isoformat()
             campaign_result['status'] = 'completed'
             
         except Exception as e:
@@ -433,7 +433,7 @@ class CampaignWorkflow:
         
         phase_result = {
             'name': phase_name,
-            'started': datetime.utcnow().isoformat(),
+            'started': datetime.now(timezone.utc).isoformat(),
             'agent_count': agent_count,
             'parallel': parallel,
             'findings': []
@@ -460,7 +460,7 @@ class CampaignWorkflow:
             results = self._execute_sequential(tasks)
         
         phase_result['results'] = results
-        phase_result['completed'] = datetime.utcnow().isoformat()
+        phase_result['completed'] = datetime.now(timezone.utc).isoformat()
         
         return phase_result
     
@@ -693,13 +693,13 @@ class EnhancedAgentOrchestrator:
             if not can_spawn:
                 raise RuntimeError(f"Resource limit: {reason}")
         
-        agent_id = f"{agent_type.value}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
+        agent_id = f"{agent_type.value}_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}"
         
         agent = AgentInstance(
             agent_id=agent_id,
             agent_type=agent_type,
             task=task,
-            started=datetime.utcnow().isoformat(),
+            started=datetime.now(timezone.utc).isoformat(),
             status="running"
         )
         
@@ -864,7 +864,7 @@ class EnhancedAgentOrchestrator:
     
     def _terminate_idle_agents(self):
         """Terminate agents idle for more than configured interval."""
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         to_terminate = []
         
         for agent_id, agent in self.active_agents.items():
@@ -973,7 +973,7 @@ class EnhancedAgentOrchestrator:
         
         campaign = {
             "target": target,
-            "started": datetime.utcnow().isoformat(),
+            "started": datetime.now(timezone.utc).isoformat(),
             "phases": [],
             "findings": []
         }
@@ -1019,7 +1019,7 @@ class EnhancedAgentOrchestrator:
         
         # Aggregate findings
         campaign["findings"] = self.aggregate_findings([osint_task, static_task, dynamic_task])
-        campaign["completed"] = datetime.utcnow().isoformat()
+        campaign["completed"] = datetime.now(timezone.utc).isoformat()
         
         self.logger.info(f"Reconnaissance campaign complete: {len(campaign['findings'])} findings")
         

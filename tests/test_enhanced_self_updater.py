@@ -16,7 +16,7 @@ import pytest
 import json
 import hashlib
 from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -381,7 +381,7 @@ class TestAutomatedToolUpdate:
         }
         
         new_patterns = [
-            {'type': 'authentication_bypass', 'learned_at': datetime.utcnow().isoformat()}
+            {'type': 'authentication_bypass', 'learned_at': datetime.now(timezone.utc).isoformat()}
         ]
         
         should_update = updater._should_update_tool(tool, new_patterns)
@@ -402,7 +402,7 @@ class TestAutomatedToolUpdate:
         }
         
         new_patterns = [
-            {'type': 'xss', 'learned_at': datetime.utcnow().isoformat()}
+            {'type': 'xss', 'learned_at': datetime.now(timezone.utc).isoformat()}
         ]
         
         updated_tool = updater._regenerate_tool(tool, new_patterns)

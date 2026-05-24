@@ -10,7 +10,7 @@ import logging
 import json
 import hashlib
 from typing import Dict, List, Optional, Tuple
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from dataclasses import dataclass, asdict
 import requests
 from urllib.parse import urlparse
@@ -143,7 +143,7 @@ class GlasseyeAI:
         
         analysis = {
             "target": target.name,
-            "started": datetime.utcnow().isoformat(),
+            "started": datetime.now(timezone.utc).isoformat(),
             "attack_surfaces": [],
             "hypotheses": [],
             "recommended_tools": [],
@@ -185,7 +185,7 @@ class GlasseyeAI:
         analysis["recommended_tools"] = self._recommend_tools(hypotheses)
         
         analysis["compliance_status"] = "approved"
-        analysis["completed"] = datetime.utcnow().isoformat()
+        analysis["completed"] = datetime.now(timezone.utc).isoformat()
         
         self.logger.info(f"Target analysis complete: {len(hypotheses)} hypotheses generated")
         
@@ -358,7 +358,7 @@ class GlasseyeAI:
     
     def _generate_hypothesis_id(self, endpoint: str, vuln_type: str) -> str:
         """Generate unique hypothesis ID."""
-        content = f"{endpoint}_{vuln_type}_{datetime.utcnow().isoformat()}"
+        content = f"{endpoint}_{vuln_type}_{datetime.now(timezone.utc).isoformat()}"
         return hashlib.md5(content.encode()).hexdigest()[:12]
     
     def _classify_risk_level(self, vuln_type: str) -> RiskLevel:
@@ -489,7 +489,7 @@ curl -X GET '{endpoint}?file=/etc/passwd'
         ]
         
         plan = ReconnaissancePlan(
-            plan_id=f"recon_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}",
+            plan_id=f"recon_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}",
             target=target.name,
             phases=phases,
             estimated_duration="1-2 weeks",
@@ -706,7 +706,7 @@ if __name__ == "__main__":
             action_type="vulnerability_testing",
             target=hypothesis['target'],
             description=f"Test {hypothesis['vulnerability_type']} on {hypothesis['target']}",
-            risk_level=RiskLevel[hypothesis['risk_level']],
+            risk_level=hypothesis['risk_level'] if isinstance(hypothesis['risk_level'], RiskLevel) else RiskLevel(hypothesis['risk_level']),
             requires_human_approval=True,
             scope_verified=True,
             researcher_owned=True
